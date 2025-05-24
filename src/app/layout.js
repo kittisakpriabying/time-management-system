@@ -4,6 +4,7 @@ import React from 'react';
 import { LaptopOutlined, NotificationOutlined, UserOutlined, LogoutOutlined } from '@ant-design/icons';
 import { Breadcrumb, Layout, Menu, theme, Avatar, Space, Typography, Button, Tooltip } from 'antd';
 import './globals.css';
+import { useRouter } from 'next/navigation';
 
 const { Header, Content, Sider } = Layout;
 const { Text } = Typography;
@@ -13,23 +14,65 @@ const items1 = ['1', '2', '3'].map((key) => ({
   label: `nav ${key}`,
 }));
 
-const items2 = [UserOutlined, LaptopOutlined, NotificationOutlined].map((icon, index) => {
-  const key = String(index + 1);
-  return {
-    key: `sub${key}`,
-    icon: React.createElement(icon),
-    label: `subnav ${key}`,
-    children: Array.from({ length: 4 }).map((_, j) => {
-      const subKey = index * 4 + j + 1;
-      return {
-        key: subKey,
-        label: `option${subKey}`,
-      };
-    }),
-  };
-});
+const permissions = {
+  create: true,
+  view: false,
+  edit: false,
+  delete: false,
+  export: true,
+  import: false,
+  approve: true,
+  reject: false,
+  publish: true,
+  archive: false,
+  manageUsers: true,
+  manageSettings: false,
+  viewReports: true,
+  manageContent: false,
+  manageNotifications: true,
+  manageRoles: false,
+  managePermissions: true,
+}
+
+
+const menu = [
+  {
+    key: 'sub1',
+    icon: React.createElement(UserOutlined),
+    label: 'สำหรับพนักงาน',
+    children: [
+      { key: 'employee-info', label: permissions.view ? 'ข้อมูลส่วนตัว' : 'ข้อมูลพนักงาน', path: '/profile' },
+      { key: 'employee-time', label: 'ขออนุมัติการลา', path: '/leave-management' },
+      { key: 'ot-management', label: 'ขออนุมัติทำงานล่วงเวลา', path: '/ot-management' },
+      { key: 'budget-management', label: 'ขออนุมัติงบประมาณ', path: '/budget-management' },
+      { key: 'it-ticket', label: 'IT Ticket', path: '/it-ticket' },
+      { key: 'meeting-management', label: 'ระบบจองห้องประชุม', path: '/meeting-management' },
+      
+    ],
+  },
+  {
+    key: 'sub2',
+    icon: React.createElement(LaptopOutlined),
+    label: 'เกี่ยวกับ Tosakan Corporation', 
+    children: [
+      { key: 'about-me', label: 'Tosakan Corporation', path: '/about-me' },
+    ],
+  },
+  // {
+  //   key: 'sub3',
+  //   icon: React.createElement(NotificationOutlined),
+  //   label: 'การแจ้งเตือน',
+  //   children: [
+  //     { key: '9', label: 'ข้อความใหม่' },
+  //     { key: '10', label: 'การแจ้งเตือน' },
+  //     { key: '11', label: 'กิจกรรม' },
+  //     { key: '12', label: 'ประกาศ' },
+  //   ],
+  // },
+];
 
 export default function RootLayout({ children }) {
+  const router = useRouter();
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -43,6 +86,19 @@ export default function RootLayout({ children }) {
   const handleLogout = () => {
     // เพิ่มโค้ดสำหรับการออกจากระบบที่นี่
     console.log('User logged out');
+    
+  };
+
+  const handleMenuClick = (e) => {
+    for (let i = 0; i < menu.length; i++) {
+      const subMenu = menu[i];
+      const child = subMenu.children.find((child) => child.key === e.key);
+      if (child) {
+        console.log('Redirecting to:', child.path);
+        router.push(child.path);
+        return;
+      }
+    }
   };
 
   return (
@@ -58,13 +114,10 @@ export default function RootLayout({ children }) {
               justifyContent: 'space-between',
             }}
           >
-            {/* Logo ชิดซ้าย */}
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <div style={{ 
                 width: 500, 
                 height: 32, 
-                // background: 'rgba(255, 255, 255, 0.2)', 
-                // margin: '16px 24px 16px 0',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -72,10 +125,8 @@ export default function RootLayout({ children }) {
                 fontWeight: 'bold',
                 fontSize: '32px',
               }}>
-              {sysName}
+                {sysName}
               </div>
-              
-              
             </div>
             
             {/* Avatar, ข้อมูลพนักงาน และปุ่ม Logout ชิดขวา */}
@@ -96,31 +147,39 @@ export default function RootLayout({ children }) {
             </Space>
           </Header>
           <Layout>
-            {/* <Sider
-              width={200}
+            {/* Sidebar - เอาคอมเมนต์ออกและปรับปรุง */}
+            <Sider
+              width={250}
               style={{
                 background: colorBgContainer,
+                boxShadow: '2px 0 8px rgba(0,0,0,0.1)',
               }}
             >
               <Menu
                 mode="inline"
                 defaultSelectedKeys={['1']}
                 defaultOpenKeys={['sub1']}
+                onClick={handleMenuClick}
                 style={{
                   height: '100%',
                   borderRight: 0,
+                  paddingTop: 16,
                 }}
-                items={items2}
+                items={menu}
               />
-            </Sider> */}
+            </Sider>
             <Layout
               style={{
-                padding: '0 24px 24px',
+                padding: '24px',
               }}
             >
-              
               <Content
-               
+                style={{
+                  background: colorBgContainer,
+                  borderRadius: borderRadiusLG,
+                  padding: 24,
+                  minHeight: 280,
+                }}
               >
                 {children}
               </Content>

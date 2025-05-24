@@ -64,12 +64,7 @@ export default function Profile() {
   }, [employeeData.avatar]);
 
   return (
-    <div className={kanit.className} style={{ 
-      background: '#f0f7ff', 
-      minHeight: '100vh',
-      padding: '20px',
-      boxSizing: 'border-box'
-    }}>
+    <div className={kanit.className} >
       <div style={{ 
         maxWidth: '1800px', 
         margin: '0 auto',
